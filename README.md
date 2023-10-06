@@ -1,6 +1,7 @@
 WIP toy game engine written in C using Raylib and rlImGui/cImGui.
 
-#Requirements
+# Requirements
+
 Raylib 4.5+
 
 rlImGui
