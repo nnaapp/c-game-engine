@@ -1,4 +1,4 @@
-#include <windows.h>
+#include <libloaderapi.h>
 #include "../include/windows_utils.h"
 
 bool GetExecutablePath(char *dest, size_t size)
