@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 #include <memoryapi.h>
 #include "../include/arena.h"
 
