@@ -7,7 +7,6 @@
 #include <limits.h>
 #include "../include/raylib.h"
 #include "../include/raymath.h"
-#include "../include/cJSON.h"
 #include "../include/ecs.h"
 #include "../include/event.h"
 #include "../include/components.h"

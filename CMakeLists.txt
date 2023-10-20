@@ -29,9 +29,10 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
   endif()
 endif()
 
-aux_source_directory(lib/imgui IMGUI_SRC)
-add_library(imgui ${IMGUI_SRC})
-target_include_directories(imgui PRIVATE lib/ lib/imgui/ include/)
+file(GLOB IMGUI_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/*.cpp")
+
+add_library(rlcimgui STATIC ${IMGUI_SOURCES})
+target_include_directories(rlcimgui PRIVATE lib/imgui/ lib/ include/)
 
 add_executable(cgame src/cgame.c src/arena.c src/console.c src/ecs.c src/event.c)
 target_include_directories(cgame PUBLIC include)
@@ -41,4 +42,4 @@ target_link_libraries(cgame PUBLIC raylib winmm kernel32 opengl32 gdi32)
 add_executable(editor src/editorimgui.c)
 target_include_directories(editor PUBLIC include)
 target_link_directories(editor PUBLIC lib)
-target_link_libraries(editor PUBLIC raylib imgui stdc++ winmm kernel32 opengl32 gdi32)
+target_link_libraries(editor PUBLIC raylib rlcimgui stdc++ winmm kernel32 opengl32 gdi32)
