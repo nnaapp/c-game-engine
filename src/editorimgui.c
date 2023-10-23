@@ -28,9 +28,32 @@ int main(void)
         rlImGuiBegin();
 
         igShowDemoWindow(NULL);
-        // bool open = true;
-        // igShowDemoWindow(&open);
-        // igText("Hello world!");
+
+        // Testing for tile selector, for tilemap editor
+        bool showWindow = true;
+        igBegin("Tile Selector Window", &showWindow, 0);
+
+        igText("Tile Set Selector");
+
+        static bool selected[9] = {true, false, false, false, false, false, false, false, false};
+
+        for (int y = 0; y < 3; y++)
+        {
+            for (int x = 0; x < 3; x++)
+            {
+                if (x > 0)
+                    igSameLine(0, -10.0f);
+                igPushID_Int(3 * y + x);
+                if (igSelectable_Bool("Tile", selected[3 * y + x], 0, (ImVec2){80, 80}))
+                {
+                    selected[3 * y + x] ^= 1;
+                }
+                igPopID();
+            }
+        }
+
+        igEnd();
+        // End of tile selector testing
 
         // cImGui and rlImGui end frame
         rlImGuiEnd();

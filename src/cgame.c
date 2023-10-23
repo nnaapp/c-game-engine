@@ -306,8 +306,9 @@ int GameLoop(const int screenW, const int screenH)
         sprintf(generalPageBuf, "Gen. Pages : %d", generalArena->pages);
         DrawText(generalPageBuf, screenW * 0.05f, screenH * 0.05f + 100, DEBUG_FONT, DEBUG_TEXT_COLOR);
         //
-
+        
         DrawSystem(ecs, drawRects, texts, positions);
+
         ConsoleUpdate(&console);
 
         EndDrawing();
