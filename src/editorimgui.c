@@ -5,8 +5,11 @@
 #include "../include/rlImGui.h"
 #include <stdbool.h>
 #include <stdlib.h>
+#include "../include/util.h"
 
 bool TileSelector();
+void RenderGrid(Vector2Int dimensions, int cellSize, Color color);
+void CameraControls(Camera2D *camera);
 
 int main(void)
 {
@@ -18,6 +21,12 @@ int main(void)
 
     // cImGui and rlImGui setup
     rlImGuiSetup(true);
+
+    Camera2D camera;
+    camera.offset = (Vector2){ displaySize.x / 2, displaySize.y / 2 };
+    camera.rotation = 0.0f;
+    camera.target = (Vector2){ displaySize.x / 2, displaySize.y / 2 };
+    camera.zoom = 1.0f;
 
     while (!WindowShouldClose())
     {        
@@ -31,11 +40,22 @@ int main(void)
 
         // D for demo window (shows all the things ImGui can do)
         static bool showDemo = false;
-        if (IsKeyPressed(KEY_D)) showDemo = !showDemo;
+        if (IsKeyPressed(KEY_GRAVE)) showDemo = !showDemo;
         if (showDemo) igShowDemoWindow(NULL);
 
         // Function for prototype tile selector
         TileSelector();
+
+        // Start camera rendering
+        CameraControls(&camera);
+        BeginMode2D(camera);
+
+        static const Vector2Int gridDimensions = { 24, 24 };
+        static const Color gridColor = { 219, 219, 219, 90 };
+        RenderGrid(gridDimensions, 32, gridColor);
+
+        EndMode2D();
+        // End camera rendering
 
         // cImGui and rlImGui end frame
         rlImGuiEnd();
@@ -83,4 +103,37 @@ bool TileSelector()
     igEnd();
 
     return currentSelect;
+}
+
+void RenderGrid(Vector2Int dimensions, int cellSize, Color color)
+{
+    DrawLine(0, 0, 0, dimensions.y * cellSize, color);
+    DrawLine(0, 0, dimensions.x * cellSize, 0, color);
+    DrawLine(dimensions.x * cellSize, 0, dimensions.x * cellSize, dimensions.y * cellSize, color);
+    DrawLine(0, dimensions.y * cellSize, dimensions.x * cellSize, dimensions.y * cellSize, color);
+        
+    for (int i = 0; i < dimensions.x; i++)
+    {
+        DrawLine(i * cellSize, 0, i * cellSize, dimensions.y * cellSize, color);
+    }
+
+    for (int i = 0; i < dimensions.y; i++)
+    {
+        DrawLine(0, i * cellSize, dimensions.x * cellSize, i * cellSize, color);
+    }
+}
+
+void CameraControls(Camera2D *camera)
+{
+    const float moveSpeed = 5.0f;
+    if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) camera->target.y -= moveSpeed;
+    if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) camera->target.y += moveSpeed;
+    if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) camera->target.x -= moveSpeed;
+    if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) camera->target.x += moveSpeed;
+
+    const float zoomSpeed = 0.1f;
+    if ((IsKeyPressed(KEY_SEMICOLON) || IsKeyDown(KEY_LEFT_BRACKET)) && camera->zoom - zoomSpeed > 0.1f) camera->zoom -= zoomSpeed;
+    if (IsKeyPressed(KEY_APOSTROPHE) || IsKeyDown(KEY_RIGHT_BRACKET)) camera->zoom += zoomSpeed; 
+
+    if (IsKeyPressed(KEY_BACKSLASH)) camera->zoom = 1.0f;
 }

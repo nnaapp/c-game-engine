@@ -8,8 +8,8 @@ project(CGameEngine VERSION 1.0
                     DESCRIPTION "Game engine in C"
                     LANGUAGES C CXX)
 
-add_compile_options(-g -Wall -m64)
-add_link_options(-g -Wall -m64)
+add_compile_options(-Wall -Wextra -Wno-missing-braces -m64)
+add_link_options(-Wall -Wextra -Wno-missing-braces -m64)
 
 set(RAYLIB_VERSION 4.5.0)
 find_package(raylib ${RAYLIB_VERSION} QUIET) # QUIET or REQUIRED
