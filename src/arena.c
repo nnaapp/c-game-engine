@@ -1,13 +1,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <memoryapi.h>
+#include "../include/windows_utils.h"
 #include "../include/arena.h"
 
 // 16gb virtual alloc max
 #define VIRTUAL_ALLOC_SIZE 64000000000
-
-// windows page size
-#define PAGE_SIZE 4096
 
 // default alignment
 #define DEFAULT_ALIGN (2*(sizeof(void *)))
@@ -69,14 +67,16 @@ void *ArenaPush(Arena *arena, uint64_t allocSize, uint64_t align)
     // Align that position, and get offset from start of arena
     uintptr_t arenaOffset = AlignPtr(unusedAddress, align) - (uintptr_t)arena->arena;
 
+    int32_t pageSize = GetPageSize();
+
     // Get ptr and change offset to reflect space being allocated
     void *ptr = &arena->arena[arenaOffset];
-    int32_t nextPageDistance = (arenaOffset + allocSize) - (arena->pages * PAGE_SIZE);
+    int32_t nextPageDistance = (arenaOffset + allocSize) - (arena->pages * pageSize);
     if (nextPageDistance > 0)
     {
-        int32_t newPages = (nextPageDistance / PAGE_SIZE) + 1;
+        int32_t newPages = (nextPageDistance / pageSize) + 1;
         arena->pages += newPages;
-        VirtualAlloc(ptr, newPages * PAGE_SIZE, MEM_COMMIT, PAGE_READWRITE);
+        VirtualAlloc(ptr, newPages * pageSize, MEM_COMMIT, PAGE_READWRITE);
     }
     arena->offset = arenaOffset + allocSize;
 

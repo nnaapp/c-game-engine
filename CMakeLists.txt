@@ -39,7 +39,7 @@ target_include_directories(cgame PUBLIC include)
 target_link_directories(cgame PUBLIC lib)
 target_link_libraries(cgame PUBLIC raylib winmm kernel32 opengl32 gdi32)
 
-add_executable(editor src/editorimgui.c)
+add_executable(editor src/editor.c src/arena.c src/windows_utils.c)
 target_include_directories(editor PUBLIC include)
 target_link_directories(editor PUBLIC lib)
 target_link_libraries(editor PUBLIC raylib rlcimgui stdc++ winmm kernel32 opengl32 gdi32)

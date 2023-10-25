@@ -6,9 +6,12 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "../include/util.h"
+#include "../include/arena.h"
+#include "../include/dynamicarray.h"
 
 bool TileSelector();
 void RenderGrid(Vector2Int dimensions, int cellSize, Color color);
+void RenderTiles(Vector2Int dimensions, int32_t cellSize, DynamicTiles tilemap);
 void CameraControls(Camera2D *camera);
 
 int main(void)
@@ -16,7 +19,7 @@ int main(void)
     Vector2 displaySize = { 1024, 1024 };
     
     // Raylib window initialization
-    InitWindow(displaySize.x, displaySize.y, "ImGui Test");
+    InitWindow(displaySize.x, displaySize.y, "Tilemap Editor");
     SetTargetFPS(144);
 
     // cImGui and rlImGui setup
@@ -28,6 +31,15 @@ int main(void)
     camera.target = (Vector2){ displaySize.x / 2, displaySize.y / 2 };
     camera.zoom = 1.0f;
 
+    Vector2Int mapDimensions = { 24, 24 };
+    DynamicTiles tilemap;
+    InitDynamicArray(tilemap, Color);
+    DynamicResize(tilemap, Color, mapDimensions.x * mapDimensions.y);
+    for (int i = 0; i < mapDimensions.x * mapDimensions.y; i++)
+    {
+        AppendArrayDynamic(tilemap, BLACK);
+    }
+   
     while (!WindowShouldClose())
     {        
         // Begin raylib frame
@@ -50,9 +62,19 @@ int main(void)
         CameraControls(&camera);
         BeginMode2D(camera);
 
-        static const Vector2Int gridDimensions = { 24, 24 };
         static const Color gridColor = { 219, 219, 219, 90 };
-        RenderGrid(gridDimensions, 32, gridColor);
+        static const int32_t cellSize = 32;
+        Vector2 mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), camera);
+        for (int i = 0; i < mapDimensions.y; i++)
+        {
+            for (int j = 0; j < mapDimensions.x; j++)
+            {
+                if (CheckCollisionPointRec(mouseWorldPos, (Rectangle){ j * cellSize, i * cellSize, cellSize, cellSize }))
+                    tilemap.values[mapDimensions.x * i + j] = GREEN;
+            }
+        }
+        RenderTiles(mapDimensions, cellSize, tilemap);
+        RenderGrid(mapDimensions, cellSize, gridColor);
 
         EndMode2D();
         // End camera rendering
@@ -105,21 +127,37 @@ bool TileSelector()
     return currentSelect;
 }
 
-void RenderGrid(Vector2Int dimensions, int cellSize, Color color)
+void RenderGrid(Vector2Int dimensions, int32_t cellSize, Color color)
 {
-    DrawLine(0, 0, 0, dimensions.y * cellSize, color);
-    DrawLine(0, 0, dimensions.x * cellSize, 0, color);
-    DrawLine(dimensions.x * cellSize, 0, dimensions.x * cellSize, dimensions.y * cellSize, color);
-    DrawLine(0, dimensions.y * cellSize, dimensions.x * cellSize, dimensions.y * cellSize, color);
-        
-    for (int i = 0; i < dimensions.x; i++)
+    Vector2 start, end;   
+
+    for (int i = 0; i <= dimensions.x; i++)
     {
-        DrawLine(i * cellSize, 0, i * cellSize, dimensions.y * cellSize, color);
+        start.x = i * cellSize;
+        start.y = 0;
+        end.x = i * cellSize;
+        end.y = dimensions.y * cellSize;
+        DrawLineEx(start, end, 2, color);
     }
 
+    for (int i = 0; i <= dimensions.y; i++)
+    {
+        start.x = 0;
+        start.y = i * cellSize;
+        end.x = dimensions.x * cellSize;
+        end.y = i * cellSize;
+        DrawLineEx(start, end, 2, color);
+    }
+}
+
+void RenderTiles(Vector2Int dimensions, int32_t cellSize, DynamicTiles tilemap)
+{
     for (int i = 0; i < dimensions.y; i++)
     {
-        DrawLine(0, i * cellSize, dimensions.x * cellSize, i * cellSize, color);
+        for (int j = 0; j < dimensions.x; j++)
+        {
+            DrawRectangle(j * cellSize, i * cellSize, cellSize, cellSize, tilemap.values[dimensions.x * i + j]);
+        }
     }
 }
 

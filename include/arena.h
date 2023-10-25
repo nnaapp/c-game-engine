@@ -36,7 +36,7 @@ void ArenaPop(Arena *arena, uint64_t popSize);
 void ArenaClear(Arena *arena);
 
 // Macros for ease of read/writing
-#define PushDefaultAlign(arena, size) ArenaPush(arena, size, DEFAULT_ALIGN)
+#define PushDefaultAlign(arena, count) ArenaPush(arena, size, DEFAULT_ALIGN)
 #define PushArray(arena, type, count) ArenaPush(arena, sizeof(type) * count, alignof(type))
 #define PushArrayZero(arena, type, count) ArenaPushZero(arena, sizeof(type) * count, alignof(type))
 #define PushStruct(arena, type) PushArray(arena, type, 1)
